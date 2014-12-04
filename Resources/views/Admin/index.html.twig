@@ -1,0 +1,280 @@
+{% extends 'NewscoopNewscoopBundle::admin_layout.html.twig' %}
+
+{% block admin_title %}{{ parent() }} - GoogleEvents Admin{% endblock %}
+{% block admin_page_title_content %}GoogleEvents Admin{% endblock %}
+
+{% block admin_stylesheets %}
+<link rel="stylesheet" href="{{ asset('/bundles/newscoopnewscoop/css/jquery.dynatable.css') }}">
+<link rel="stylesheet" href="{{ asset('/bundles/newscoopgoogleeventsplugin/css/backend.css') }}">
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ asset('/js/select2/select2.js') }}"></script>
+<script src="{{ asset('/bundles/newscoopnewscoop/js/jquery.dynatable.js') }}"></script>
+{% endblock %}
+
+{% block admin_content %}
+<div class="plugin-container">
+    <h4>Google Events</h4>
+    <div>
+      <span>
+        <label class="admin-form-label" for="apikey">Google Apikey:</label>
+        <input class="med-input" type="text" id="apikey" name="apikey" value="{{ apikey }}">
+      </span>
+    </div>
+    <div> 
+      <span>
+        <label class="admin-form-label" for="delete-old">Delete Past Events:</label>
+        <input value="OFF" name="delete-old" type="radio" class="delete-old-switch" 
+          {% if delete_old == "OFF" %} checked {% endif %}>
+        <label for="delete-old-off"> OFF</label>
+        <input value="ON" name="delete-old" type="radio" class="delete-old-switch" 
+          {% if delete_old == "ON" %} checked {% endif %}>
+        <label for="delete-old-on"> ON</label>
+      </span>
+    </div>
+    <div>
+      <span>
+        <label class="admin-form-label" for="calendar-id">Calendar Id:</label>
+        <input class="med-input" type="text" id="calendar-id" value="{{ calendar_id }}">
+        <button id="add-calendar">Add Calendar</button>
+      <span>
+      <div id="calendar-list-container">
+        <ul id="calendar-list">
+          {% for calendar in calendar_list %}
+            {% if calendar|length %}
+              <li class="calender-item">
+                <span>
+                  <label>{{ calendar }}</label>
+                  <button class="delete-calendar" data-calendar-id="{{ calendar }}">Delete</button>
+                </span>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div>
+        <label class="admin-form-label" for="start">Start :</label>
+        <input type="text" id="start" value="{{ start }}">
+      </span>
+    </div>
+    <div>
+      <span>
+        <label class="admin-form-label" for="end">End :</label>
+        <input type="text" id="end" value="{{ end }}">
+      </span>
+    </div>
+    <div>
+      <span>
+        <label class="admin-form-label" for="mins">Run every :</label>
+        <input type="text" id="mins" value="{{ mins }}"> minutes
+      </span>
+    </div>
+    <br />
+    <br />
+    <div>
+      <span>
+          <button id="run-now">Ingest Now</button>
+          <button id="save-settings">Save Settings</button>
+      </span>
+    </div>
+    
+    <br />
+    <br />
+
+    <table id="events-table" class="table table-bordered table-hover" style="word-wrap: break-word;table-layout: fixed;">
+        <thead>
+            <tr style="background-color: grey;">
+                <th data-dynatable-column="id" style="width: 120px;" >Id</th>
+                <th data-dynatable-column="creatorEmail">Creator Email</th>
+                <th data-dynatable-column="htmlLink">Link</th>
+                <th data-dynatable-column="description">Description</th>
+                <th data-dynatable-column="location">Location</th>
+                <th data-dynatable-column="createdAt">Created</th>
+                <th data-dynatable-column="start">Start</th>
+                <th data-dynatable-column="end">End</th>
+                <th data-dynatable-column="isActive">Active</th>
+                <th data-dynatable-column="delete">Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript">
+
+    var dynatable = $('#events-table').dynatable({
+        inputs: {
+            paginationClass: 'pagination',
+            paginationActiveClass: 'current',
+            paginationDisabledClass: 'unavailable',
+            paginationPrev: '&laquo;',
+            paginationNext: '&raquo;',
+        },
+        dataset: {
+            ajax: true,
+            ajaxUrl: Routing.generate('newscoop_googleeventsplugin_admin_loadevents'),
+            ajaxOnLoad: false,
+            records: [],
+            perPageDefault: 5,
+            perPageOptions: [5,10,20,50,100],
+        },
+        features: {
+            paginate: true,
+        },
+        writers: {
+            _cellWriter: function (column, record) {
+                if (column.id == 'id') {
+                    return "<td>"+record.id+"</td>"; 
+                }
+                if (column.id == 'location') {
+                    return "<td>"+record.location+"</td>";
+                }
+                if (column.id == 'htmlLink') {
+                    return "<td>"+record.htmlLink+"</td>";
+                }
+                if (column.id == 'description') {
+                    return "<td>"+record.description+"</td>";
+                }
+                if (column.id == 'creatorEmail') {
+                    return "<td>"+record.creatorEmail+"</td>";
+                }
+                if (column.id == 'createdAt') {
+                    return "<td>"+record.createdAt.date+"</td>";
+                }
+                if (column.id == 'start') {
+                    return "<td>"+record.start.date+"</td>";
+                }
+                if (column.id == 'end') {
+                    return "<td>"+record.end.date+"</td>";
+                }
+                if (column.id == 'isActive') {
+                    if (record.isActive) {
+                        return "<td><button class='btn btn-xs btn-default action-btn dynatable-event-status' data-event-id='"+record.id+"'>ACTIVE</button></td>";
+                    }
+                    return "<td><button class='btn btn-xs btn-default action-btn dynatable-event-status' data-event-id='"+record.id+"'>HIDDEN</button></td>";
+                }
+                if (column.id == 'delete') {
+                    return "<td><button class='btn btn-xs btn-default action-btn dynatable-event-delete' data-event-id='"+record.id+"'>DELETE</button></td>";
+                }
+            }
+        }
+    }).data('dynatable');
+
+    $('.dynatable-event-delete').live('click', function(e){
+        var eventId = $(this).attr('data-event-id');
+        var url = '/admin/google-events/delete/' + eventId;
+
+        $.post(url)
+            .done(function(data) {
+              if (data.status) {
+                flashMessage('Event deleted sucessfully');
+                // refresh dynatable
+                dynatable.process();
+                return true;
+            }
+
+            flashMessage('Error deleting event', 'error');
+        });
+    });
+
+    $('.dynatable-event-status').live('click', function(e){
+        var eventId = $(this).attr('data-event-id');
+        var state = $(this).html();
+        var that = $(this);
+
+        if (state === "ACTIVE") {
+            var url = '/admin/google-events/deactivate/' + eventId;
+            state = "HIDDEN";
+        } else {
+            var url = '/admin/google-events/activate/' + eventId;
+            state = "ACTIVE";
+        }
+
+        $.post(url)
+            .done(function(data) {
+              if (data.status) {
+                flashMessage('Event active status updated sucessfully');
+                that.html(state);
+                return true;
+            }
+
+            flashMessage('Error updating event status', 'error');
+        });
+    });
+
+    $('#add-calendar').live('click', function() {
+        var data = {
+            calendar_id: $('#calendar-id').val()
+        }
+        $.post("/admin/google-events/add-calendar", data)
+            .done(function(data) {
+                if (data.status) {
+                    flashMessage('Calendar added successfully');
+                    location.reload();
+                    return true;
+                }
+            flashMessage('Error adding calendar: ' + data.message, 'error');
+        });
+    });
+
+    $('.delete-calendar').live('click', function() {
+        var calendarId = $(this).data('calendar-id');
+        var data = {
+            calendar_id: calendarId
+        }
+        $.post("/admin/google-events/delete-calendar", data)
+            .done(function(data) {
+                if (data.status) {
+                    flashMessage('Calendar deleted successfully');
+                    location.reload();
+                    return true;
+                }
+            flashMessage('Error deleting calendar: ' + data.message, 'error');
+        });
+    });
+
+    $('#save-settings').live('click', function() {
+        var data = {
+            delete_old: $('input[name=delete-old]:checked').val(),
+            start: $('#start').val(),
+            end: $('#end').val(),
+            mins: $('#mins').val(),
+            apikey: $('#apikey').val(),
+            calendar_id: $('#calendar-id').val()
+        }
+
+        $.post("/admin/google-events", data)
+            .done(function(data) {
+                if (data.status) {
+                    flashMessage('Settings saved successfully');
+                    return true;
+                }
+            flashMessage('Error saving settings: ' + data.message, 'error');
+        });
+    });
+
+    $('#run-now').live('click', function() {
+        flashMessage('Processing');
+        var data = {
+            start: $('#start').val(),
+            end: $('#end').val(),
+        }
+        $.post("/admin/google-events/ingest", data)
+            .done(function(data) {
+                if (data.status) {
+                    flashMessage('Ingest ran successfully: ' + data.message);
+                    // refresh dynatable
+                    dynatable.process();
+                    return true;
+                }
+            flashMessage('Error running ingest: ' + data.message, 'error');
+        });
+    });
+
+</script>
+
+{% endblock %}
+

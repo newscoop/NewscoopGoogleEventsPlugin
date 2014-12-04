@@ -1,0 +1,100 @@
+.form-control {
+    margin: 0px 0px 10px 0px;
+}
+
+.form-control input {
+    margin-right: 10px;
+}
+
+#photos-table {
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+#photos-table th {
+    background: #D1D1D1;
+}
+#photos-table th a {
+    color: #000;
+}
+.plugin-container {
+    padding: 10px 10px 30px 10px;
+    border: 1px solid #ccc;
+    background-color: #FFF;
+    font-size: 12px;
+}
+
+.plugin-placeholder {
+    margin-top: 30px;
+}
+
+.actionbar {
+    float: right;
+}
+
+.button-align {
+    margin-right: 5px;
+}
+
+a.action-btn {margin-left: 5px; margin-bottom: 5px;}
+
+
+.active {
+    font-weight: bolder;
+}
+
+.selected img {
+    opacity:0.5;
+}
+
+#slider-thumbs {
+    margin-top: 20px;
+}
+
+.carousel-control {
+    padding-top: 30%;
+}
+
+a.action-btn {
+    width: 90%;
+}
+
+button.description-btn {
+    width: 100%;
+}
+
+.dynatable-processing {
+  background: #000;
+  opacity: 0.6;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+.dynatable-processing span {
+  background: #FFF;
+  border: solid 1px;
+  color: #333;
+  padding: 25px;
+  font-size: 2em;
+  box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+}
+.dynatable-processing span img {
+  vertical-align: middle;
+}
+
+.admin-form-label {
+  width: 120px;
+  text-align: right;
+}
+
+.med-input {
+  width: 300px;
+}
+
+#calendar-list-container {
+  padding: 5px;
+}
+
+.calendar-item {
+  padding: 5px;
+}

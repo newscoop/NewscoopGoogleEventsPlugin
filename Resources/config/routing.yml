@@ -1,0 +1,4 @@
+newscoop_google_events_plugin:
+    resource: "@NewscoopGoogleEventsPluginBundle/Controller"
+    type:     annotation
+    prefix:   /
