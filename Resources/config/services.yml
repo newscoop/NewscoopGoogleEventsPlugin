@@ -1,0 +1,19 @@
+services:
+    newscoop_google_events_plugin.lifecyclesubscriber:
+        class: Newscoop\GoogleEventsPluginBundle\EventListener\LifecycleSubscriber
+        arguments:
+            - @service_container
+        tags:
+            - { name: kernel.event_subscriber}
+
+    newscoop_google_events_plugin.google_events_service:
+        class: Newscoop\GoogleEventsPluginBundle\Services\GoogleEventsService
+        arguments:
+            - @service_container
+
+    newscoop_google_events_plugin.configure_menu_listener:
+        class: Newscoop\GoogleEventsPluginBundle\EventListener\ConfigureMenuListener
+        tags:
+          - { name: kernel.event_listener, event: newscoop_newscoop.menu_configure, method: onMenuConfigure }
+        arguments:
+            - @translator

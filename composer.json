@@ -1,0 +1,23 @@
+{
+    "name": "newscoop/google-events-plugin-bundle",
+    "description": "GoogleEvents plugin for Newscoop",
+    "keywords": ["newscoop", "google-events", "events"],
+    "version": "0.0.5",
+    "type": "newscoop-plugin",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Mark Lewis",
+            "email": "mark.lewis@sourcefabric.org"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "newscoop/plugins-installer": ">=v0.2"
+    },
+    "autoload": {
+        "psr-0": { "Newscoop\\GoogleEventsPluginBundle\\GoogleEventsPluginBundle": "" }
+    },
+    "target-dir": "Newscoop/GoogleEventsPluginBundle",
+    "minimum-stability": "dev"
+}
