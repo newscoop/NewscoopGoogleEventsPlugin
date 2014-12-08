@@ -56,13 +56,13 @@
     </div>
     <div>
         <label class="admin-form-label" for="start">Start :</label>
-        <input type="text" id="start" value="{{ start }}">
+        <input class="datepicker" type="text" id="start" value="{{ start }}">
       </span>
     </div>
     <div>
       <span>
         <label class="admin-form-label" for="end">End :</label>
-        <input type="text" id="end" value="{{ end }}">
+        <input class="datepicker" type="text" id="end" value="{{ end }}">
       </span>
     </div>
     <div>
@@ -104,7 +104,11 @@
 </div>
 
 <script type="text/javascript">
-
+    $(function() {
+        $('.datepicker').datepicker({
+          dateFormat: 'yy-mm-dd\T00:00:00\Z'
+        });
+    });
     var dynatable = $('#events-table').dynatable({
         inputs: {
             paginationClass: 'pagination',
