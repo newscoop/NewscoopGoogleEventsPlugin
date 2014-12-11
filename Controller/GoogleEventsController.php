@@ -111,7 +111,7 @@ class GoogleEventsController extends Controller
         $smarty = $templatesService->getSmarty();
         $templateDir = array_shift($smarty->getTemplateDir());
 
-        if ($id > 0) {
+        if (!empty($id)) {
             $event = $googleEventsService->getGoogleEventById($id);
             $templateFile = "_views/google_event.tpl";
             $response = new Response();
