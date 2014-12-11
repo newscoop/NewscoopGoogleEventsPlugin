@@ -146,6 +146,14 @@ class GoogleEventsService
 
         try {
             //TODO: extract relational data from json
+
+            $linkedDescription = preg_replace_callback("/\b(https?):\/\/([-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]*)\b/i",
+                create_function(
+                    '$matches',
+                    'return "<a href=\'".($matches[0])."\'>".($matches[0])."</a>";'
+                ),
+                $event['description']
+            );
             $googleEvent = new GoogleEvent();
             $googleEvent->setId($event['id'])
                 ->setKind($event['kind'])
@@ -153,7 +161,7 @@ class GoogleEventsService
                 ->setStatus($event['status'])
                 ->setHtmlLink($event['htmlLink'])
                 ->setSummary($event['summary'])
-                ->setDescription($event['description'])
+                ->setDescription($linkedDescription)
                 ->setLocation($event['location'])
                 ->setCreatorEmail($event['creator']['email'])
                 ->setCreatorDisplayName($event['creator']['displayName'])
