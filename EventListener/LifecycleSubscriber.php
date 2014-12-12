@@ -36,7 +36,7 @@ class LifecycleSubscriber implements EventSubscriberInterface
         $this->preferences = $this->container->get('system_preferences_service');
         $this->cronjobs = array(
             "GoogleEvents plugin ingest events cron job" => array(
-                'command' => $appDirectory . ' google_events_events:ingest',
+                'command' => $appDirectory . ' google_events:ingest',
                 'schedule' => '*/15 * * * *',
             )
         );
