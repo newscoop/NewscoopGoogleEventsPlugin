@@ -43,7 +43,7 @@ class AdminController extends Controller
             $newDeleteOld = $request->request->get('delete_old');
             $newStart = $request->request->get('start');
             $newEnd = $request->request->get('end');
-            $newMins = $request->request->get('mins');
+            $newMins = max(5, $request->request->get('mins'));
             $newApikey = $request->request->get('apikey');
             $newCalendarId = $request->request->get('calendar_id');
             try {
