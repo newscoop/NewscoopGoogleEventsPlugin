@@ -15,78 +15,102 @@
 
 {% block admin_content %}
 <div class="plugin-container">
-    <h4>Google Events</h4>
-    <div>
-      <span>
-        <label class="admin-form-label" for="apikey">Google Apikey:</label>
-        <input class="med-input" type="text" id="apikey" name="apikey" value="{{ apikey }}">
-      </span>
+
+  <div class="row"> 
+  <div class="col-sm-12 col-md-6">
+    <form class="form-horizontal">
+
+    <div class="form-group">
+        <label class="control-label col-sm-3" for="apikey">Apikey:</label>
+        <div class="col-sm-9">
+          <input class="form-control" type="text" id="apikey" name="apikey" value="{{ apikey }}">
+        </div>
     </div>
-    <div> 
-      <span>
-        <label class="admin-form-label" for="delete-old">Delete Past Events:</label>
-        <input value="OFF" name="delete-old" type="radio" class="delete-old-switch" 
+    <div class="form-group"> 
+      <label class="control-label col-sm-3" for="delete-old">Delete Past Events:</label>
+      <div class="col-sm-9">
+        <input 
+          value="OFF" 
+          name="delete-old" 
+          type="radio" 
+          class="delete-old-switch" 
           {% if delete_old == "OFF" %} checked {% endif %}>
-        <label for="delete-old-off"> OFF</label>
-        <input value="ON" name="delete-old" type="radio" class="delete-old-switch" 
+        <label class="" for="delete-old-off"> OFF</label>
+        <input 
+          value="ON" 
+          name="delete-old" 
+          type="radio" 
+          class="delete-old-switch" 
           {% if delete_old == "ON" %} checked {% endif %}>
-        <label for="delete-old-on"> ON</label>
-      </span>
+        <label class="" for="delete-old-on"> ON</label>
+      </div>
     </div>
-    <div>
-      <span>
-        <label class="admin-form-label" for="calendar-id">Calendar Id:</label>
-        <input class="med-input" type="text" id="calendar-id" value="{{ calendar_id }}">
-        <button id="add-calendar">Add Calendar</button>
-      <span>
-      <div id="calendar-list-container">
-        <ul id="calendar-list">
+    <div class="form-group">
+      <label class="control-label col-sm-3" for="calendar-id">Calendar Id:</label>
+      <div class="col-sm-9">
+        <div class="input-group">
+          <input class="form-control" type="text" id="calendar-id" value="{{ calendar_id }}">
+          <span class="input-group-btn">
+            <button class="btn btn-default" id="add-calendar">Add</button>
+          </span>
+        </div>
+      </div>
+
+      <div id="calendar-list-container" class="col-md-9 col-md-offset-3">
+        <ul id="calendar-list form-control">
           {% for calendar in calendar_list %}
             {% if calendar|length %}
               <li class="calender-item">
-                <span>
-                  <label>{{ calendar }}</label>
-                  <button class="delete-calendar" data-calendar-id="{{ calendar }}">Delete</button>
-                </span>
+                <h4>
+                  <label class="label label-default">
+                    {{ calendar }}
+                    <span 
+                      class="glyphicon glyphicon-remove delete-calendar clickable" 
+                      data-calendar-id="{{ calendar }}"></span>
+                  </label>
+                </h4>
               </li>
             {% endif %}
           {% endfor %}
         </ul>
       </div>
     </div>
-    <div>
-        <label class="admin-form-label" for="start">Start :</label>
-        <input class="datepicker" type="text" id="start" value="{{ start }}">
-      </span>
+    <div class="form-group">
+      <label class="control-label col-sm-3" for="start">Start :</label>
+      <div class="col-sm-9">
+        <input class="sm-input datepicker form-control col-sm-3" type="text" id="start" value="{{ start }}">
+      </div>
     </div>
-    <div>
-      <span>
-        <label class="admin-form-label" for="end">End :</label>
-        <input class="datepicker" type="text" id="end" value="{{ end }}">
-      </span>
+    <div class="form-group">
+      <label class="control-label col-sm-3" for="end">End :</label>
+      <div class="col-sm-9">
+        <input class="sm-input datepicker form-control col-sm-3" type="text" id="end" value="{{ end }}">
+      </div>
     </div>
-    <div>
-      <span>
-        <label class="admin-form-label" for="mins">Run every :</label>
-        <input type="text" id="mins" value="{{ mins }}"> minutes
-      </span>
+    <div class="form-group">
+      <label class="control-label col-sm-3" for="mins">Run every :</label>
+      <div class="col-sm-9">
+        <input class="sm-input form-control col-sm-10" type="text" id="mins" value="{{ mins }}">
+        <label class="col-sm-2">Minutes</label>
+      </div>
     </div>
-    <br />
-    <br />
-    <div>
-      <span>
-          <button id="run-now">Ingest Now</button>
-          <button id="save-settings">Save Settings</button>
-      </span>
+    <div class="form-group">
+      <label class="control-label col-sm-3"></label>
+      <div class="col-sm-9">
+        <button class="btn btn-default" id="run-now">Ingest Now</button>
+        <button class="btn btn-default" id="save-settings">Save Settings</button>
+      </div>
     </div>
-    
-    <br />
-    <br />
+  </form>
+  </div>
+  </div><!-- end row -->
 
-    <table id="events-table" class="table table-bordered table-hover" style="word-wrap: break-word;table-layout: fixed;">
+  <div class="row"> 
+  <div class="col-sm-12 col-ms-12">
+    <table id="events-table" class="table table-bordered table-striped table-hover" style="word-wrap: break-word;table-layout: fixed;">
         <thead>
             <tr style="background-color: grey;">
-                <th data-dynatable-column="id" style="width: 120px;" >Id</th>
+                <th data-dynatable-column="summary" style="width: 120px;" >Summary</th>
                 <th data-dynatable-column="creatorEmail">Creator Email</th>
                 <th data-dynatable-column="htmlLink">Link</th>
                 <th data-dynatable-column="description">Description</th>
@@ -94,13 +118,15 @@
                 <th data-dynatable-column="createdAt">Created</th>
                 <th data-dynatable-column="start">Start</th>
                 <th data-dynatable-column="end">End</th>
-                <th data-dynatable-column="isActive">Active</th>
-                <th data-dynatable-column="delete">Delete</th>
+                <th data-dynatable-column="tools">Tools</th>
             </tr>
         </thead>
         <tbody>
         </tbody>
     </table>
+  </div>
+  </div>
+
 </div>
 
 <script type="text/javascript">
@@ -130,8 +156,8 @@
         },
         writers: {
             _cellWriter: function (column, record) {
-                if (column.id == 'id') {
-                    return "<td>"+record.id+"</td>"; 
+                if (column.id == 'summary') {
+                    return "<td>"+record.summary+"</td>"; 
                 }
                 if (column.id == 'location') {
                     return "<td>"+record.location+"</td>";
@@ -140,7 +166,7 @@
                     return "<td>"+record.htmlLink+"</td>";
                 }
                 if (column.id == 'description') {
-                    return "<td>"+record.description+"</td>";
+                    return "<td>"+record.description.substring(0, 100)+"</td>";
                 }
                 if (column.id == 'creatorEmail') {
                     return "<td>"+record.creatorEmail+"</td>";
@@ -154,14 +180,13 @@
                 if (column.id == 'end') {
                     return "<td>"+record.end.date+"</td>";
                 }
-                if (column.id == 'isActive') {
+                if (column.id == 'tools') {
                     if (record.isActive) {
-                        return "<td><button class='btn btn-xs btn-default action-btn dynatable-event-status' data-event-id='"+record.id+"'>ACTIVE</button></td>";
+                        return "<td><button class='btn btn-xs btn-default action-btn dynatable-event-status' data-event-id='"+record.id+"'>ACTIVE</button>" +
+                        "&nbsp;<button class='btn btn-xs btn-default action-btn dynatable-event-delete' data-event-id='"+record.id+"'>DELETE</button></td>";
                     }
-                    return "<td><button class='btn btn-xs btn-default action-btn dynatable-event-status' data-event-id='"+record.id+"'>HIDDEN</button></td>";
-                }
-                if (column.id == 'delete') {
-                    return "<td><button class='btn btn-xs btn-default action-btn dynatable-event-delete' data-event-id='"+record.id+"'>DELETE</button></td>";
+                    return "<td><button class='btn btn-xs btn-default action-btn dynatable-event-status' data-event-id='"+record.id+"'>HIDDEN</button>" +
+                    "&nbsp;<button class='btn btn-xs btn-default action-btn dynatable-event-delete' data-event-id='"+record.id+"'>DELETE</button></td>";
                 }
             }
         }

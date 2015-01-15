@@ -87,8 +87,16 @@ button.description-btn {
   text-align: right;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 .med-input {
   width: 300px;
+}
+
+.sm-input {
+  width: 150px;
 }
 
 #calendar-list-container {
