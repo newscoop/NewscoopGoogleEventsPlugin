@@ -159,6 +159,7 @@ class AdminController extends Controller
             foreach ($events as $event) {
                 $processed[] = array(
                     'id' => $event->getId(),
+                    'summary' => $event->getSummary(),
                     'location' => $event->getLocation(),
                     'htmlLink' => $event->getHtmlLink(),
                     'description' => $event->getDescription(),
@@ -235,7 +236,7 @@ class AdminController extends Controller
     {
         try {
             $em = $this->container->get('em');
-            $googleEventsService = $this->container->get('newscoop_google-events_plugin.google-events_service');
+            $googleEventsService = $this->container->get('newscoop_google_events_plugin.google_events_service');
             $status = true;
 
             $event = $em->getRepository('Newscoop\GoogleEventsPluginBundle\Entity\GoogleEvent')
@@ -243,6 +244,7 @@ class AdminController extends Controller
             $googleEventsService->activateGoogleEvent($event);
 
         } catch (\Exception $e) {
+            error_log($e->getMessage());
             $status = false;
         }
 
