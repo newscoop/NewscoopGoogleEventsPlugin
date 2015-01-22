@@ -106,3 +106,7 @@ button.description-btn {
 .calendar-item {
   padding: 5px;
 }
+
+.sort-link a, .sort-link a:visited, .sort-link a:focus, .sort-link a:hover, .sort-link a:active {      
+  color: white !important;                                                                             
+}
