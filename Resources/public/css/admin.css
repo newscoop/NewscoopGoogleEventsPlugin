@@ -70,3 +70,8 @@ div.td {
     -webkit-box-shadow: none;
     box-shadow: none;
 }
+
+.sort-link a, .sort-link a:visited, .sort-link a:focus, .sort-link a:hover, .sort-link a:active {
+  color: white !important;
+}
+
