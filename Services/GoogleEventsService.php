@@ -249,6 +249,7 @@ class GoogleEventsService
         if ($end) {
             $url .= "&timeMax=" . urlencode($end);
         }
+        $url .= "&singleEvents=true";
         try {
             $em = $this->container->get('em');
             $client = new \Buzz\Client\Curl();
