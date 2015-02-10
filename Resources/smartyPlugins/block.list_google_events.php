@@ -18,7 +18,7 @@ use Newscoop\GoogleEventsPluginBundle\Entity\GoogleEvent;
 function smarty_block_list_google_events(array $params, $content, &$smarty, &$repeat)
 {
 
-    $start = (isset($params['start'])) ? $params['start'] : 'now';
+    $start = (isset($params['start'])) ? $params['start'] : null;
     $end = (isset($params['end'])) ? $params['end'] : null;
     $length = (isset($params['length'])) ? $params['length'] : null;
 
@@ -32,8 +32,11 @@ function smarty_block_list_google_events(array $params, $content, &$smarty, &$re
         try {
             $qb = $em->getRepository('Newscoop\GoogleEventsPluginBundle\Entity\GoogleEvent')
                 ->createQueryBuilder('p')
-                ->where('p.start > :start')
-                ->setParameter('start', new \DateTime($start));
+                ->where('p.isActive = 1');
+            if (isset($start)) {
+                $qb->andWhere('p.start > :start')
+                    ->setParameter('start', new \DateTime($start));
+            }
             if (isset($end)) {
                 $qb->andWhere('p.end < :end')
                     ->setParameter('end', new \DateTime($end));
@@ -41,8 +44,7 @@ function smarty_block_list_google_events(array $params, $content, &$smarty, &$re
             if (isset($length)) {
                 $qb->setMaxResults($length);
             }
-            $qb->andWhere('p.isActive = 1')
-                ->addOrderBy('p.start', 'ASC');
+            $qb->addOrderBy('p.start', 'ASC');
             $query = $qb->getQuery();
             $events = $query->getResult();
             $cacheService->save($cacheKey, $events);
