@@ -166,7 +166,7 @@
                     return "<td>"+record.htmlLink+"</td>";
                 }
                 if (column.id == 'description') {
-                    return "<td>"+record.description.substring(0, 100)+"</td>";
+                    return "<td>"+encodeURI(record.description.substring(0, 100))+"</td>";
                 }
                 if (column.id == 'creatorEmail') {
                     return "<td>"+record.creatorEmail+"</td>";
