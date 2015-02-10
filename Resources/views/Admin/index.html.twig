@@ -274,7 +274,7 @@
             apikey: $('#apikey').val(),
             calendar_id: $('#calendar-id').val()
         }
-console.log(data);
+
         $.post("/admin/google-events", data)
             .done(function(data) {
                 if (data.status) {
