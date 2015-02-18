@@ -107,6 +107,8 @@ class LifecycleSubscriber implements EventSubscriberInterface
     private function removeJobs()
     {
         foreach ($this->cronjobs as $jobName => $jobConfig) {
+            // remove schedule in case it changed after being installed
+            unset($jobConfig['schedule']);
             $this->scheduler->removeJob($jobName, $jobConfig);
         }
     }
