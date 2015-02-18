@@ -48,6 +48,11 @@ class LifecycleSubscriber implements EventSubscriberInterface
         $tool->updateSchema($this->getClasses(), true);
 
         $this->preferences->set('GoogleEventsBaseUrl', 'https://www.googleapis.com/calendar/v3/');
+        $this->preferences->set('GoogleEventsApiKey', '');
+        $this->preferences->set('GoogleEventsDeleteOld', 'OFF');
+        $this->preferences->set('GoogleEventsStart', '');
+        $this->preferences->set('GoogleEventsEnd', '');
+        $this->preferences->set('GoogleEventsCalendarList', '');
 
         // Generate proxies for entities
         $this->em->getProxyFactory()->generateProxyClasses($this->getClasses(), __DIR__ . '/../../../../library/Proxy');
@@ -68,6 +73,13 @@ class LifecycleSubscriber implements EventSubscriberInterface
         $tool = new \Doctrine\ORM\Tools\SchemaTool($this->em);
         $tool->dropSchema($this->getClasses(), true);
         $this->removeJobs();
+
+        $this->preferences->delete('GoogleEventsBaseUrl');
+        $this->preferences->delete('GoogleEventsApiKey');
+        $this->preferences->delete('GoogleEventsDeleteOld');
+        $this->preferences->delete('GoogleEventsStart');
+        $this->preferences->delete('GoogleEventsEnd');
+        $this->preferences->delete('GoogleEventsCalendarList');
     }
 
     public static function getSubscribedEvents()
