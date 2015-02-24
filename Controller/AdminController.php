@@ -51,7 +51,7 @@ class AdminController extends Controller
                 $preferencesService->set('GoogleEventsDeleteOld', $newDeleteOld);
                 $preferencesService->set('GoogleEventsStart', $newStart);
                 $preferencesService->set('GoogleEventsEnd', $newEnd);
-                $newCommand = "$console $command $newStart $newEnd";
+                $newCommand = "$console $command --start=$newStart --end=$newEnd";
                 $newSchedule = "*/$newMins * * * *"; 
                 $currentIngestJob->setCommand($newCommand);
                 $currentIngestJob->setSchedule($newSchedule);
