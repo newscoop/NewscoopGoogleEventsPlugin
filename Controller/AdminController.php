@@ -60,7 +60,7 @@ class AdminController extends Controller
                 $preferencesService->set('GoogleEventsEnd', $newEnd);
                 $preferencesService->set('GoogleEventsTimeZone', $newTimezone);
                 $newCommand = "$console $command --start=$newStart --end=$newEnd";
-                $newSchedule = "*/$newMins * * * *";
+                $newSchedule = "*/{$newMins} * * * *";
                 $currentIngestJob->setCommand($newCommand);
                 $currentIngestJob->setSchedule($newSchedule);
                 $em->flush();
