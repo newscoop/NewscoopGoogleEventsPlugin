@@ -16,7 +16,7 @@
 {% block admin_content %}
 <div class="plugin-container">
 
-  <div class="row"> 
+  <div class="row">
   <div class="col-sm-12 col-md-6">
     <form class="form-horizontal">
 
@@ -26,21 +26,21 @@
           <input class="form-control" type="text" id="apikey" name="apikey" value="{{ apikey }}">
         </div>
     </div>
-    <div class="form-group"> 
+    <div class="form-group">
       <label class="control-label col-sm-3" for="delete-old">Delete Past Events:</label>
       <div class="col-sm-9">
-        <input 
-          value="OFF" 
-          name="delete-old" 
-          type="radio" 
-          class="delete-old-switch" 
+        <input
+          value="OFF"
+          name="delete-old"
+          type="radio"
+          class="delete-old-switch"
           {% if delete_old == "OFF" %} checked {% endif %}>
         <label class="" for="delete-old-off"> OFF</label>
-        <input 
-          value="ON" 
-          name="delete-old" 
-          type="radio" 
-          class="delete-old-switch" 
+        <input
+          value="ON"
+          name="delete-old"
+          type="radio"
+          class="delete-old-switch"
           {% if delete_old == "ON" %} checked {% endif %}>
         <label class="" for="delete-old-on"> ON</label>
       </div>
@@ -64,8 +64,8 @@
                 <h4>
                   <label class="label label-default">
                     {{ calendar }}
-                    <span 
-                      class="glyphicon glyphicon-remove delete-calendar clickable" 
+                    <span
+                      class="glyphicon glyphicon-remove delete-calendar clickable"
                       data-calendar-id="{{ calendar }}"></span>
                   </label>
                 </h4>
@@ -89,23 +89,32 @@
     </div>
     <div class="form-group">
       <label class="control-label col-sm-3" for="mins">Run every :</label>
+      <div class="col-sm-9 controls">
+        <div class="input-group">
+          <input class="sm-input form-control" type="text" id="mins" value="{{ mins }}">
+          <div class="input-group-addon">minutes</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-3" for="timezone">Custom timezone override :</label>
       <div class="col-sm-9">
-        <input class="sm-input form-control col-sm-10" type="text" id="mins" value="{{ mins }}">
-        <label class="col-sm-2">Minutes</label>
+        <input class="sm-input form-control" type="text" id="timezone" value="{{ timezone }}">
+        <p class="help-block">View a list of valid timezones <a href="http://php.net/manual/timezones.php" target="_blank">here</a>.</p>
       </div>
     </div>
     <div class="form-group">
       <label class="control-label col-sm-3"></label>
       <div class="col-sm-9">
         <button class="btn btn-default" id="run-now">Ingest Now</button>
-        <button class="btn btn-default" id="save-settings">Save Settings</button>
+        <button class="btn btn-default" id="save-settings" type="button">Save Settings</button>
       </div>
     </div>
   </form>
   </div>
   </div><!-- end row -->
 
-  <div class="row"> 
+  <div class="row">
   <div class="col-sm-12 col-ms-12">
     <table id="events-table" class="table table-bordered table-striped table-hover" style="word-wrap: break-word;table-layout: fixed;">
         <thead>
@@ -157,7 +166,7 @@
         writers: {
             _cellWriter: function (column, record) {
                 if (column.id == 'summary') {
-                    return "<td>"+record.summary+"</td>"; 
+                    return "<td>"+record.summary+"</td>";
                 }
                 if (column.id == 'location') {
                     return "<td>"+record.location+"</td>";
@@ -265,11 +274,15 @@
         });
     });
 
-    $('#save-settings').live('click', function() {
+    $('#save-settings').live('click', function(e) {
+
+        e.preventDefault();
+
         var data = {
             delete_old: $('input[name=delete-old]:checked').val(),
             start: $('#start').val(),
             end: $('#end').val(),
+            timezone: $('#timezone').val(),
             mins: $('#mins').val(),
             apikey: $('#apikey').val(),
             calendar_id: $('#calendar-id').val()

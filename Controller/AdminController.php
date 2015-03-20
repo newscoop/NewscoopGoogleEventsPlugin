@@ -37,27 +37,36 @@ class AdminController extends Controller
         $apikey = $preferencesService->GoogleEventsApiKey;
         $start = $preferencesService->GoogleEventsStart;
         $end = $preferencesService->GoogleEventsEnd;
+        $timezone = $preferencesService->GoogleEventsTimeZone;
 
         // settings update
         if ($request->isMethod('POST')) {
             $newDeleteOld = $request->request->get('delete_old');
             $newStart = $request->request->get('start');
             $newEnd = $request->request->get('end');
+            $newTimezone = $request->request->get('timezone');
             $newMins = max(5, $request->request->get('mins'));
             $newApikey = $request->request->get('apikey');
             $newCalendarId = $request->request->get('calendar_id');
             try {
+
+                if (trim($newTimezone) != '' && !in_array($newTimezone, timezone_identifiers_list())) {
+                    throw new \Exception('The entered timezone is invalid.');
+                }
+
                 $preferencesService->set('GoogleEventsApiKey', $newApikey);
                 $preferencesService->set('GoogleEventsDeleteOld', $newDeleteOld);
                 $preferencesService->set('GoogleEventsStart', $newStart);
                 $preferencesService->set('GoogleEventsEnd', $newEnd);
+                $preferencesService->set('GoogleEventsTimeZone', $newTimezone);
                 $newCommand = "$console $command --start=$newStart --end=$newEnd";
-                $newSchedule = "*/$newMins * * * *"; 
+                $newSchedule = "*/{$newMins} * * * *";
                 $currentIngestJob->setCommand($newCommand);
                 $currentIngestJob->setSchedule($newSchedule);
                 $em->flush();
                 $status = true;
                 $message = "";
+
             } catch (\Exception $e) {
                 $status = false;
                 $message = $e->getMessage();
@@ -70,6 +79,7 @@ class AdminController extends Controller
             'delete_old' => $deleteOld,
             'start' => $start,
             'end' => $end,
+            'timezone' => $timezone,
             'mins' => $mins,
             'apikey' => $apikey,
             'calendar_list' => explode(',', $calendarList)
@@ -88,7 +98,7 @@ class AdminController extends Controller
             array_push($calendarList, $calendarId);
             $preferencesService->set('GoogleEventsCalendarList', implode(",",$calendarList));
         }
-    
+
         return new JsonResponse(array("status" => true, "message" => $calendarId.' added'));
     }
 
@@ -101,9 +111,9 @@ class AdminController extends Controller
         $calendarId = $request->request->get('calendar_id');
         $calendarList = explode(",", $preferencesService->GoogleEventsCalendarList);
         $index = array_search($calendarId, $calendarList);
-        unset($calendarList[$index]); 
+        unset($calendarList[$index]);
         $preferencesService->set('GoogleEventsCalendarList', implode(",",$calendarList));
-    
+
         return new JsonResponse(array("status" => true, "message" => $calendarId.' deleted'));
     }
 
@@ -114,10 +124,13 @@ class AdminController extends Controller
     {
         $googleEventsService = $this->container->getService('newscoop_google_events_plugin.google_events_service');
         $preferencesService = $this->container->get('system_preferences_service');
+        $deleteOld = $preferencesService->GoogleEventsDeleteOld;
         $calendarList = explode(',', $preferencesService->GoogleEventsCalendarList);
         $start = ($request->request->get('start')) ? $request->request->get('start') : date('Y-m-d\T00:00:00\Z', strtotime("-1 month"));
         $end = $request->request->get('end');
         $eventsAdded = 0;
+
+        $googleEventsService->setTemporaryTimezone();
 
         foreach ($calendarList as $calendarId) {
             if (!empty($calendarId)) {
@@ -125,12 +138,21 @@ class AdminController extends Controller
                 $eventsAdded += $added;
             }
         }
+
+        $googleEventsService->restoreTimezone();
+
         if ($eventsAdded) {
             $status = true;
             $message = "Added " . $eventsAdded . " events";
         } else {
             $status = false;
             $message = "Added " . $eventsAdded . " events";
+        }
+
+        if ($deleteOld == "ON") {
+            // delete old events
+            $deleted = $googleEventsService->deleteOldEvents();
+            $message = sprintf('%s %s', $message, 'and removed old events');
         }
 
         return new JsonResponse(array("status" => $status, "message" => $message));
@@ -141,20 +163,20 @@ class AdminController extends Controller
      * @Route("admin/google-events/load/", options={"expose"=true})
      */
     public function loadEventsAction(Request $request)
-    {   
+    {
         $em = $this->get('em');
         $cacheService = $this->get('newscoop.cache');
         $googleEventsService = $this->container->get('newscoop_google_events_plugin.google_events_service');
         $criteria = $this->processRequest($request);
-        $eventsCount = $googleEventsService->countBy(array('isActive' => true)); 
+        $eventsCount = $googleEventsService->countBy(array('isActive' => true));
         $eventsInactiveCount = $googleEventsService->countBy(array('isActive' => false));
-     
+
         $cacheKey = array('google_events__'.md5(serialize($criteria)), $eventsCount, $eventsInactiveCount);
         if ($cacheService->contains($cacheKey)) {
-            $responseArray = $cacheService->fetch($cacheKey);                                                                                               
-        } else { 
-            $events = $em->getRepository('Newscoop\GoogleEventsPluginBundle\Entity\GoogleEvent')->getListByCriteria($criteria);                                         
-            
+            $responseArray = $cacheService->fetch($cacheKey);
+        } else {
+            $events = $em->getRepository('Newscoop\GoogleEventsPluginBundle\Entity\GoogleEvent')->getListByCriteria($criteria);
+
             $processed = array();
             foreach ($events as $event) {
                 $processed[] = array(
@@ -168,19 +190,19 @@ class AdminController extends Controller
                     'end' => $event->getEnd(),
                     'creatorEmail' => $event->getCreatorEmail(),
                     'isActive' => $event->getIsActive()
-                );                                                                                           
-            }                                                                                                                                               
-            
+                );
+            }
+
             $responseArray = array(
                 'records' => $processed,
                 'queryRecordCount' => $events->count,
                 'totalRecordCount'=> count($events->items)
-            );                                                                                                                                              
-            
-            $cacheService->save($cacheKey, $responseArray);                                                                                                 
-        }                                                                                                                                                   
-        
-        return new JsonResponse($responseArray);                                                                                                            
+            );
+
+            $cacheService->save($cacheKey, $responseArray);
+        }
+
+        return new JsonResponse($responseArray);
     }
 
     /**
@@ -204,9 +226,9 @@ class AdminController extends Controller
      * @return GoogleEventCriteria
      */
     private function processRequest(Request $request)
-    {   
+    {
         $criteria = new GoogleEventCriteria();
- 
+
         if ($request->query->has('sorts')) {
             foreach ($request->get('sorts') as $key => $value) {
                 $criteria->orderBy[$key] = $value == '-1' ? 'desc' : 'asc';
@@ -224,7 +246,7 @@ class AdminController extends Controller
         if ($request->query->has('offset')) {
             $criteria->firstResult = $request->query->get('offset');
         }
-        
+
         return $criteria;
     }
 
