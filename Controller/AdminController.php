@@ -133,6 +133,12 @@ class AdminController extends Controller
             $message = "Added " . $eventsAdded . " events";
         }
 
+        if ($deleteOld == "ON") {
+            // delete old events
+            $deleted = $googleEventsService->deleteOldEvents();
+            $message = sprintf('%s %s', $message, 'and removed old events');
+        }
+
         return new JsonResponse(array("status" => $status, "message" => $message));
     }
 
