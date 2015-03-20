@@ -19,18 +19,22 @@ class GoogleEventsService
     /** @var Container */
     protected $container;
 
+    /** @var @var string */
+    protected $currentTimezone;
+
     /**
      * @param Container $container
      */
     public function __construct(Container $container)
     {
         $this->container = $container;
+        $this->currentTimezone = date_default_timezone_get();
     }
 
     /**
-     * get all events 
+     * get all events
      *
-     * @return array 
+     * @return array
      */
     public function getAllGoogleEvents()
     {
@@ -74,7 +78,7 @@ class GoogleEventsService
      * @return boolean
      */
     public function deleteOldEvents()
-    {   
+    {
         $deleted = false;
         $deleted = $this->getRepository()
             ->deleteOldEvents();
@@ -195,7 +199,7 @@ class GoogleEventsService
         if ($event) {
             return $event;
         }
-        
+
         return false;
     }
 
@@ -206,7 +210,7 @@ class GoogleEventsService
      * @return int
      */
     public function countBy(array $criteria = array())
-    {   
+    {
         return $this->getRepository()->countBy($criteria);
     }
 
@@ -258,17 +262,17 @@ class GoogleEventsService
             $response =  $browser->get($url);
 
             $results = json_decode($response->getContent(), true);
-            $events = $results['items']; 
+            $events = $results['items'];
             $eventsAdded = 0;
 
             foreach ($events as $event) {
                 // check if we already have this event
                 $now = 0;
-                $updated = 0; 
+                $updated = 0;
                 $existingEvent = $this->getGoogleEventById($event['id']);
                 if ($existingEvent) {
-                    $imported = $existingEvent->getImportedAt()->format('U'); 
-                    $updated = strtotime($event['updated']); 
+                    $imported = $existingEvent->getImportedAt()->format('U');
+                    $updated = strtotime($event['updated']);
                     if ($updated > $imported) {
                         $this->deleteGoogleEvent($existingEvent->getId());
                     }
@@ -285,6 +289,26 @@ class GoogleEventsService
             error_log('ERROR: '.$e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * Sets timezone to value from Google Events form
+     */
+    public function setTemporaryTimezone()
+    {
+        $preferencesService = $this->container->get('system_preferences_service');
+        $timeZone = $preferencesService->GoogleEventsTimeZone;
+        if (!empty($timeZone)) {
+            date_default_timezone_set($timeZone);
+        }
+    }
+
+    /**
+     * Retstores timezone to the value of service construction
+     */
+    public function restoreTimezone()
+    {
+        date_default_timezone_set($this->currentTimezone);
     }
 }
 

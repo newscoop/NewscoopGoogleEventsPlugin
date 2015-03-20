@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Newscoop\GoogleEventsPluginBundle\Entity\GoogleEvent;
 
 /**
- * Gets google events via google api by hashtag and insert into plugin_google_event 
+ * Gets google events via google api by hashtag and insert into plugin_google_event
  */
 class IngestGoogleEventsCommand extends ContainerAwareCommand
 {
@@ -44,7 +44,10 @@ class IngestGoogleEventsCommand extends ContainerAwareCommand
         $deleteOld = $preferencesService->GoogleEventsDeleteOld;
 
         try {
+            $googleEventsService->setTemporaryTimezone();
+
             if (empty($calendarId)) {
+
                 $calendarList = explode(",", $preferencesService->GoogleEventsCalendarList);
                 $eventsAdded = 0;
                 foreach ($calendarList as $calendarId) {
@@ -56,7 +59,9 @@ class IngestGoogleEventsCommand extends ContainerAwareCommand
             } else {
                 $eventsAdded = $googleEventsService->ingestEvents($calendarId, $start, $end);
             }
-            
+
+            $googleEventsService->restoreTimezone();
+
             if ($deleteOld == "ON") {
                 // delete old events
                 $deleted = $googleEventsService->deleteOldEvents();
