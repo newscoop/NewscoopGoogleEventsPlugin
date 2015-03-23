@@ -20,7 +20,7 @@ class LifecycleSubscriber implements EventSubscriberInterface
     private $container;
 
     protected $em;
-    
+
     protected $scheduler;
 
     protected $cronjobs;
@@ -52,6 +52,7 @@ class LifecycleSubscriber implements EventSubscriberInterface
         $this->preferences->set('GoogleEventsDeleteOld', 'OFF');
         $this->preferences->set('GoogleEventsStart', '');
         $this->preferences->set('GoogleEventsEnd', '');
+        $this->preferences->set('GoogleEventsTimeZone', '');
         $this->preferences->set('GoogleEventsCalendarList', '');
 
         // Generate proxies for entities
@@ -80,6 +81,7 @@ class LifecycleSubscriber implements EventSubscriberInterface
         $this->preferences->delete('GoogleEventsDeleteOld');
         $this->preferences->delete('GoogleEventsStart');
         $this->preferences->delete('GoogleEventsEnd');
+        $this->preferences->delete('GoogleEventsTimeZone');
         $this->preferences->delete('GoogleEventsCalendarList');
     }
 
