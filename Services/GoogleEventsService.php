@@ -253,7 +253,7 @@ class GoogleEventsService
         if ($end) {
             $url .= "&timeMax=" . urlencode($end);
         }
-        $url .= "&singleEvents=true";
+        $url .= "&singleEvents=true&maxResults=2500&orderBy=startTime";
         try {
             $em = $this->container->get('em');
             $client = new \Buzz\Client\Curl();
